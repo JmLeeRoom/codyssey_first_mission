@@ -1,9 +1,8 @@
-# GitHub 저장소 연동 가이드 (로컬 ↔ 원격 저장소 연결)
+# GitHub 저장소 연동 가이드 (로컬 ↔ 원격 저장소 연결) — 완료 기록
 
-> 대상 저장소: `https://github.com/JmLeeRoom/codyssey_first_mission.git` (GitHub 웹에서 이미 생성 완료)
-> 이 문서는 실제로 입력할 명령어를 정리한 **실행 가이드**입니다. 진행 체크(`- [ ]`)는 루트 `README.md`에서 관리하세요.
->
-> 확인 결과 현재 상태: 이 폴더는 **아직 Git 저장소로 초기화되어 있지 않고**, 전역 Git 사용자 정보(`user.name`/`user.email`)도 **설정되어 있지 않습니다.** 아래를 순서대로 따라가면 됩니다.
+> 대상 저장소: `https://github.com/JmLeeRoom/codyssey_first_mission.git`
+> 대응 체크리스트: [`CheckList.md`](../../CheckList.md) 섹션 10 "Git 설정 및 GitHub/VSCode 연동" / [`README.md`](../../README.md) 4.9
+> 아래 절차대로 초기화 → 원격 연결 → push까지 완료됐고, VSCode 연동 증거도 확보됐다.
 
 ## 0. 사전 확인 — GitHub 저장소를 "빈 저장소"로 만들었는가?
 
@@ -107,7 +106,68 @@ git status            # "Your branch is up to date with 'origin/main'" 확인
 
 ## 완료 후 기술 문서에 남길 증거
 
-- [ ] `git config --list` 출력 (사용자 설정 증거)
-- [ ] `git remote -v` 출력 (원격 연결 증거)
-- [ ] `git push` 성공 로그
-- [ ] GitHub 웹에서 파일이 반영된 화면 스크린샷
+- [x] `git config --list` 출력 (사용자 설정 증거)
+
+```bash
+$ git config --list
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+user.name=JmLeeRoom
+user.email=[MASKED]@gmail.com
+remote.origin.url=https://github.com/JmLeeRoom/codyssey_first_mission.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.main.remote=origin
+branch.main.merge=refs/heads/main
+```
+
+- [x] `git remote -v` 출력 (원격 연결 증거)
+
+```bash
+$ git remote -v
+origin  https://github.com/JmLeeRoom/codyssey_first_mission.git (fetch)
+origin  https://github.com/JmLeeRoom/codyssey_first_mission.git (push)
+```
+
+- [x] `git push` 성공 로그 (최초 push + 이후 추가 push)
+
+```bash
+# 최초 초기화 ~ push (docs/result/image.png)
+$ git init -b main
+$ git config user.name "JmLeeRoom"
+$ git config user.email "togoda1945@gmail.com"
+$ git add . && git commit -m "Initial commit: mission checklist and setup guide"
+$ git remote add origin https://github.com/JmLeeRoom/codyssey_first_mission.git
+$ git push -u origin main
+ * [new branch]      main -> main
+
+# 이후 app/ 추가 후 push
+$ git add .
+$ git commit -m "git check"
+[main 751469a] git check
+ 6 files changed, 180 insertions(+)
+ create mode 100644 app/.dockerignore
+ create mode 100644 app/Dockerfile
+ create mode 100644 app/compose.yaml
+ create mode 100644 app/nginx/default.conf
+ create mode 100644 app/site/index.html
+ create mode 100644 app/site/styles.css
+$ git push origin main
+To https://github.com/JmLeeRoom/codyssey_first_mission.git
+   4411b74..751469a  main -> main
+```
+
+![최초 git init ~ push 로그](../result/image.png)
+
+- [x] VSCode에서 GitHub 로그인 완료
+
+VSCode 계정 메뉴에 `JmLeeRoom (GitHub)` 계정이 로그인된 상태로 표시된다.
+
+![VSCode GitHub 로그인 확인](../result/image-10.png)
+
+- [x] VSCode에서 저장소 연동 완료 + 증거(스크린샷) 첨부
+
+Source Control 패널에 이 저장소의 변경 사항(25개 변경)과 커밋 그래프(`git check`, `fix readme.md to reference.md`, `Initial commit...`)가 `main` 브랜치 기준으로 표시되고, 하단 동기화 아이콘으로 원격과 연결돼 있음이 확인된다.
+
+![VSCode 저장소 연동 확인](../result/image-11.png)
