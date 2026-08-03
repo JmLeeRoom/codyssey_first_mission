@@ -1,0 +1,18 @@
+services:
+  web:
+    build:
+      context: .
+    image: workstation-web:1.0
+    ports:
+      - "127.0.0.1:${WORKSTATION_HOST_PORT:-8080}:80"
+
+  probe:
+    image: alpine:3.23
+    depends_on:
+      web:
+        condition: service_healthy
+    command:
+      - sh
+      - -c
+      - while true; do wget -qO- http://web/health; sleep 15; done
+    restart: unless-stopped

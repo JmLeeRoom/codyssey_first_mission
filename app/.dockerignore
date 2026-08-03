@@ -1,0 +1,7 @@
+# 빌드에 필요한 파일만 컨텍스트로 전송합니다.
+*
+!Dockerfile
+!nginx/
+!nginx/**
+!site/
+!site/**
