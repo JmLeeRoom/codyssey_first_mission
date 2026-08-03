@@ -160,6 +160,12 @@ To https://github.com/JmLeeRoom/codyssey_first_mission.git
 
 ![최초 git init ~ push 로그](../result/image.png)
 
+- [x] GitHub 웹에서 파일이 반영된 화면 스크린샷 (공개 저장소 확인 포함)
+
+`codyssey_first_mission` 저장소 페이지에 `Public` 배지, `app`/`docs` 폴더, `CheckList.md`, 최근 커밋(`git check`)까지 반영된 것이 확인된다. 이 화면으로 "GitHub 저장소가 공개(Public) 설정"이라는 것도 함께 증명된다.
+
+![GitHub 저장소 웹 화면 — Public, 최신 커밋 반영](../result/image-9.png)
+
 - [x] VSCode에서 GitHub 로그인 완료
 
 VSCode 계정 메뉴에 `JmLeeRoom (GitHub)` 계정이 로그인된 상태로 표시된다.

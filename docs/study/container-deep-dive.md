@@ -58,19 +58,41 @@ CONTAINER ID   IMAGE     COMMAND            CREATED          STATUS          POR
 
 **컨테이너의 수명은 PID 1의 수명과 같다** — 이것이 두 명령의 차이가 생기는 근본 원인이다.
 
-## 아직 실습하지 않은 것: `docker attach`로 직접 관찰하기
+## `docker attach`로 직접 관찰하기 (절반 완료)
 
-위 표는 개념 정리이고, 실제로 `attach` 후 `exit`했을 때 컨테이너가 `Exited`로 바뀌는 것과 `Ctrl+P, Ctrl+Q`로 분리했을 때 `Up`으로 남는 것을 **직접 눈으로 확인하는 실습**이 아직 남아있다. TTY가 필요해 자동화할 수 없고 손으로 해야 한다.
+위 표는 개념 정리이고, 실제로 `attach` 후 `exit`했을 때 컨테이너가 `Exited`로 바뀌는 것과 `Ctrl+P, Ctrl+Q`로 분리했을 때 `Up`으로 남는 것을 **직접 눈으로 확인하는 실습**이 필요하다. TTY가 필요해 자동화할 수 없고 손으로 해야 한다.
 
 ```bash
 # 1) 대화형 TTY로 컨테이너 실행
-docker run -dit --name attach-demo ubuntu bash
+$ docker run -dit --name attach-demo1 ubuntu bash
+d09c60006dc9...
 
 # 2) attach로 PID 1(bash)에 직접 연결
-docker attach attach-demo
+$ docker attach attach-demo1
+root@d09c60006dc9:/#
 ```
-![alt text](../result/image-5.png)
-- 이 상태에서 `exit`을 입력하면 → PID 1이 죽으므로 컨테이너가 즉시 `Exited`가 된다. `docker ps -a --filter name=attach-demo`로 확인.
-- 대신 다시 `docker run -dit --name attach-demo-2 ubuntu bash` 후 `docker attach attach-demo-2`로 들어가 이번엔 `Ctrl+P`를 누르고 이어서 `Ctrl+Q`를 누르면(분리/detach) → 컨테이너는 `Up` 상태로 계속 살아있다. `docker ps --filter name=attach-demo-2`로 확인.
 
-**주의**: `docker attach`한 셸 안에서 절대 `docker ...` 명령을 입력하지 않는다 — 그 순간 호스트가 아니라 **컨테이너 내부**에 있는 것이므로(프롬프트가 `root@<컨테이너ID>:/#` 형태로 바뀐다), 컨테이너 안에는 docker CLI가 없어 `command not found`가 난다. 두 실습(exit로 종료 / detach로 유지)을 각각 별도 컨테이너로 나눠서 진행하면 헷갈리지 않는다.
+![attach로 PID 1(bash)에 연결된 상태 — 프롬프트가 컨테이너 내부로 바뀜](../result/image-5.png)
+
+프롬프트가 `root@d09c60006dc9:/#`로 바뀐 것이 지금 컨테이너 내부 PID 1에 직접 연결됐다는 증거다.
+
+### 절반만 완료: `exit` → `Exited` 확인됨, `Ctrl+P,Ctrl+Q` 분리는 아직
+
+```bash
+$ docker ps -a --filter name=attach-demo1
+CONTAINER ID   IMAGE     COMMAND   ...   STATUS                       ...   NAMES
+d09c60006dc9   ubuntu    "bash"    ...   Exited (127) ...                   attach-demo1
+```
+
+`attach-demo1`이 `Exited (127)`로 바뀐 것이 확인된다 — 127은 "명령어를 찾을 수 없음" 종료 코드로, 이 attach 셸 안에서 `docker ...` 명령을 실수로 입력했다가(바로 아래 "주의" 참고) `command not found`가 난 뒤 `exit`한 결과로 보인다. 원인이야 어쨌든 **"PID 1이 종료되면 컨테이너가 Exited로 바뀐다"는 핵심은 그대로 증명**됐다.
+
+**남은 것**: `Ctrl+P` 다음 `Ctrl+Q`로 분리했을 때 컨테이너가 `Up` 상태로 남는 것은 아직 확인 전이다. 새 컨테이너로 한 번 더:
+
+```bash
+docker run -dit --name attach-demo-2 ubuntu bash
+docker attach attach-demo-2
+# 여기서 Ctrl+P, 이어서 Ctrl+Q (절대 exit 입력하지 않기)
+docker ps --filter name=attach-demo-2   # Up 상태 유지 확인
+```
+
+**주의**: `docker attach`한 셸 안에서 절대 `docker ...` 명령을 입력하지 않는다 — 그 순간 호스트가 아니라 **컨테이너 내부**에 있는 것이므로(프롬프트가 `root@<컨테이너ID>:/#` 형태로 바뀐다), 컨테이너 안에는 docker CLI가 없어 `command not found`가 난다 (`attach-demo1`에서 실제로 겪은 상황). 두 실습(exit로 종료 / detach로 유지)을 각각 별도 컨테이너로 나눠서 진행하면 헷갈리지 않는다.
